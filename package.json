@@ -1,0 +1,35 @@
+{
+  "name": "lightweight-spotify-auth-server",
+  "version": "1.0.0",
+  "description": "A lightweight Spotify Authorization Code authentication server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ModoNoob/lightweight-spotify-auth-server.git"
+  },
+  "keywords": [
+    "spotify",
+    "authentication",
+    "authorization",
+    "code",
+    "server"
+  ],
+  "author": "ModoNoob",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ModoNoob/lightweight-spotify-auth-server/issues"
+  },
+  "homepage": "https://github.com/ModoNoob/lightweight-spotify-auth-server#readme",
+  "dependencies": {
+    "body-parser": "^1.18.1",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "querystring": "^0.2.0",
+    "request": "^2.87.0"
+  }
+}

@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const express = require('express')
 const request = require('request')
 const querystring = require('querystring')

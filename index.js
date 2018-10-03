@@ -25,7 +25,6 @@ app.get('/spotify-auth/login', (req, res) => {
   let state = generateRandomString(16)
   res.cookie(stateKey, state)
 
-  // your application requests authorization
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -34,6 +33,47 @@ app.get('/spotify-auth/login', (req, res) => {
       redirect_uri: returnUrl,
       state: state
   }))
+})
+
+app.get('/spotify-auth/refresh', (req, res) => {
+  const refreshToken = req.query.refreshToken || null
+
+  if (refreshToken === null) {
+    res.redirect('/error?' +
+      querystring.stringify({
+        e: 'refresh_token_required'
+      }))
+  } else {
+    const authOptions = {
+      url: 'https://accounts.spotify.com/api/token',
+      form: {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      },
+      headers: {
+        'Authorization': 'Basic ' + (new Buffer(clientId + ':' + clientSecret).toString('base64'))
+      },
+      json: true
+    }
+
+    request.post(authOptions, (error, response, body) => {
+      if (!error && res.statusCode === 200) {
+        const accessToken = body.access_token
+        const expiresIn = body.expires_in
+
+        res.redirect('/?' +
+          querystring.stringify({
+            a: accessToken,
+            e: expiresIn
+          }))
+      } else {
+        res.redirect('/error?' +
+          querystring.stringify({
+            e: 'internal_server_error'
+          }))
+      }
+    })
+  }
 })
 
 app.get('/spotify-auth/callback', (req, res) => {
@@ -66,11 +106,13 @@ app.get('/spotify-auth/callback', (req, res) => {
       if (!error && res.statusCode === 200) {
         const accessToken = body.access_token
         const refreshToken = body.refresh_token
+        const expiresIn = body.expires_in
 
         res.redirect('/?' +
           querystring.stringify({
             a: accessToken,
-            r: refreshToken
+            r: refreshToken,
+            e: expiresIn
           }))
       } else {
         res.redirect('/error?' +

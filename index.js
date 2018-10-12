@@ -39,10 +39,10 @@ app.get('/spotify-auth/refresh', (req, res) => {
   const refreshToken = req.query.refreshToken || null
 
   if (refreshToken === null) {
-    res.redirect('/error?' +
-      querystring.stringify({
-        e: 'refresh_token_required'
-      }))
+    res.status(400)
+    res.json({
+      code: 'refresh_token_required'
+    })
   } else {
     const authOptions = {
       url: 'https://accounts.spotify.com/api/token',
@@ -61,16 +61,16 @@ app.get('/spotify-auth/refresh', (req, res) => {
         const accessToken = body.access_token
         const expiresIn = body.expires_in
 
-        res.redirect('/?' +
-          querystring.stringify({
-            a: accessToken,
-            e: expiresIn
-          }))
+        res.status(200)
+        res.json({
+          accessToken: accessToken,
+          expiresIn: expiresIn
+        })
       } else {
-        res.redirect('/error?' +
-          querystring.stringify({
-            e: 'internal_server_error'
-          }))
+        res.status(500)
+        res.json({
+          code: 'spotify_communication_error'
+        })
       }
     })
   }
@@ -82,10 +82,10 @@ app.get('/spotify-auth/callback', (req, res) => {
   const storedState = req.cookies ? req.cookies[stateKey] : null
 
   if (state === null || state !== storedState) {
-    res.redirect('/error?' +
-      querystring.stringify({
-        e: 'state_mismatch'
-      }))
+    res.status(403)
+    res.json({
+      code: 'state_mismatch'
+    })
   } else {
     res.clearCookie(stateKey)
 
@@ -108,17 +108,17 @@ app.get('/spotify-auth/callback', (req, res) => {
         const refreshToken = body.refresh_token
         const expiresIn = body.expires_in
 
-        res.redirect('/?' +
-          querystring.stringify({
-            a: accessToken,
-            r: refreshToken,
-            e: expiresIn
-          }))
+        res.status(200)
+        res.json({
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          expiresIn: expiresIn
+        })
       } else {
-        res.redirect('/error?' +
-          querystring.stringify({
-            e: 'invalid_token'
-          }))
+        res.status(500)
+        res.json({
+          code: 'spotify_communication_error'
+        })
       }
     })
   }
